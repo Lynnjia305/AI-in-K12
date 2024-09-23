@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in K-12 Education Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #00796b;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #004d40;
+        }
+        .role-button {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .role-button:hover {
+            background-color: #004d40;
+        }
+        .question-box {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .question-box button {
+            padding: 15px;
+            margin: 10px 0;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .question-box button:hover {
+            background-color: #388e3c;
+        }
+        .scoreboard {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .scoreboard h3 {
+            color: #00796b;
+        }
+        .scoreboard p {
+            font-size: 1.5em;
+            color: #004d40;
+        }
+        #challenge-message {
+            font-size: 20px;
+            color: #ff5722;
+            margin-bottom: 10px;
+        }
+        #conquer-message {
+            font-size: 18px;
+            color: #388e3c;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>AI in K-12 Education</h1>
+    <h2>Select Your Role</h2>
+    <div id="role-selection">
+        <button class="role-button" onclick="selectRole('Student')">Student</button>
+        <button class="role-button" onclick="selectRole('Teacher')">Teacher</button>
+        <button class="role-button" onclick="selectRole('Policy Maker')">Policy Maker</button>
+        <button class="role-button" onclick="selectRole('Parent')">Parent</button>
+    </div>
+
+    <div id="game-section" class="hidden">
+        <h2 id="role-title"></h2>
+        <p id="challenge-message">You're facing a challenge!</p>
+        <div class="question-box" id="question-box"></div>
+        <p id="conquer-message" class="hidden">Congratulations! You conquered the challenge. Ready for the next one?</p>
+        <div class="scoreboard">
+            <h3>Scoreboard</h3>
+            <p>Score: <span id="score">0</span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentQuestion = 0;
+    let role = '';
+    let levels = 0;
+
+    const roleScenarios = {
+        Student: [
+            // 4 Easy Questions for Students
+            {
+                question: "You are starting your new school year with AI-powered learning tools. How can AI help you in personalized learning?",
+                choices: ["It makes learning plans based on your progress.", "It replaces teachers.", "It gives every student the same content."],
+                answer: 0,
+                level: "Easy"
+            },
+            {
+                question: "In the library, you're using AI to help research for a project. What AI feature is most useful for students?",
+                choices: ["AI translates text.", "AI analyzes complex topics for you.", "AI makes games."],
+                answer: 1,
+                level: "Easy"
+            },
+            {
+                question: "Your teacher is using an AI system to monitor student performance. What advantage does this provide?",
+                choices: ["It gives feedback faster.", "It replaces all tests.", "It creates group study activities."],
+                answer: 0,
+                level: "Easy"
+            },
+            {
+                question: "AI has identified areas you struggle with. How should you use this information?",
+                choices: ["Ask for extra help on those topics.", "Ignore it.", "Use it to focus more on strong areas."],
+                answer: 0,
+                level: "Easy"
+            },
+            // 4 Medium Questions for Students
+            {
+                question: "As a student, you notice AI helping some classmates more than others. What could be a concern here?",
+                choices: ["AI is biased.", "AI is too slow.", "AI helps everyone equally."],
+                answer: 0,
+                level: "Medium"
+            },
+            {
+                question: "Your parents are concerned about AI collecting your data. What is a legitimate concern?",
+                choices: ["Data privacy.", "AI making your work easier.", "AI slowing down."],
+                answer: 0,
+                level: "Medium"
+            },
+            {
+                question: "AI provides faster feedback, but do you think it could affect teacher-student interaction?",
+                choices: ["Yes, less personal time with teachers.", "No, it doesn’t affect anything.", "Yes, but only positively."],
+                answer: 0,
+                level: "Medium"
+            },
+            {
+                question: "AI is great for improving math and reading skills, but what is a potential social drawback?",
+                choices: ["Less social interaction.", "Better group projects.", "Fewer school events."],
+                answer: 0,
+                level: "Medium"
+            },
+            // 4 Hard Questions for Students
+            {
+                question: "AI can identify students who are falling behind. How should schools ethically use this information?",
+                choices: ["Offer personalized tutoring.", "Share it publicly.", "Punish low performers."],
+                answer: 0,
+                level: "Hard"
+            },
+            {
+                question: "As a student leader, you're asked to discuss how AI impacts equal learning opportunities. What should be your main focus?",
+                choices: ["Not all schools can afford AI.", "AI is perfect for everyone.", "AI works only in rich schools."],
+                answer: 0,
+                level: "Hard"
+            },
+            {
+                question: "In the future, more jobs will involve AI. How can your school prepare you for these new careers?",
+                choices: ["Teach AI skills.", "Focus on traditional subjects.", "Ban technology in class."],
+                answer: 0,
+                level: "Hard"
+            },
+            {
+                question: "AI has improved your test scores significantly. How do you ensure it's a fair tool for everyone?",
+                choices: ["Ensure all students have access.", "Use it only for yourself.", "Not worry about others."],
+                answer: 0,
+                level: "Hard"
+            },
+            // 4 Extra Questions for Students
+            {
+                question: "You’ve conquered all challenges. What do you think is the future of AI in your school?",
+                choices: ["AI will be integrated into everything.", "AI will disappear.", "AI will only be used for tests."],
+                answer: 0,
+                level: "Extra"
+            },
+            {
+                question: "The school has to cut the AI budget. What is the best way to still benefit from AI?",
+                choices: ["Focus on key learning tools.", "Ban all AI use.", "Only use it in gym class."],
+                answer: 0,
+                level: "Extra"
+            },
+            {
+                question: "AI tools are fun, but how do they affect your creativity?",
+                choices: ["They can limit it if used too much.", "They improve it 100%.", "They don’t affect creativity."],
+                answer: 0,
+                level: "Extra"
+            },
+            {
+                question: "Your school's AI system is outdated. What’s the next step?",
+                choices: ["Upgrade to better AI.", "Keep using it as is.", "Ban it entirely."],
+                answer: 0,
+                level: "Extra"
+            }
+        ],
+        // Similar scenarios should be added for Teacher, PolicyMaker, and Parent with the same structure
+        // Replace the content according to each role's perspective (e.g., Policy Maker handling AI ethics and accessibility policies)
+    };
+
+    function selectRole(selectedRole) {
+        role = selectedRole;
+        levels = 0;
+        currentQuestion = 0;
+        score = 0;
+
+        // 隐藏角色选择部分
+        document.getElementById('role-selection').classList.add('hidden');
+        
+        // 显示游戏部分
+        document.getElementById('game-section').classList.remove('hidden');
+        
+        // 设置角色标题
+        document.getElementById('role-title').textContent = `你的角色: ${role}`;
+        
+        // 重置分数显示
+        document.getElementById('score').textContent = '0';
+        
+        // 加载第一个问题
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const questionBox = document.getElementById('question-box');
+        const currentScenario = roleScenarios[role][currentQuestion];
+        
+        if (currentScenario) {
+            questionBox.innerHTML = `
+                <h3>${currentScenario.question}</h3>
+                ${currentScenario.choices.map((choice, index) => 
+                    `<button onclick="answerQuestion(${index})">${choice}</button>`
+                ).join('')}
+            `;
+        } else {
+            questionBox.innerHTML = '<h3>恭喜你完成了所有问题!</h3>';
+        }
+    }
+
+    function answerQuestion(choiceIndex) {
+        const currentScenario = roleScenarios[role][currentQuestion];
+        if (choiceIndex === currentScenario.answer) {
+            score++;
+            document.getElementById('score').textContent = score;
+            document.getElementById('conquer-message').classList.remove('hidden');
+        } else {
+            document.getElementById('conquer-message').classList.add('hidden');
+        }
+        
+        currentQuestion++;
+        setTimeout(loadQuestion, 1000);
+    }
+
+    // ... 其他现有代码 ...
+</script>
